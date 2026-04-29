@@ -38,7 +38,7 @@ import app.aaps.core.interfaces.rx.weardata.EventData
 import app.aaps.core.interfaces.rx.weardata.ResData
 import app.aaps.core.interfaces.rx.weardata.ResFormat
 import app.aaps.core.interfaces.rx.weardata.isEquals
-import app.aaps.core.ui.extensions.toVisibility
+import app.aaps.wear.utils.toVisibility
 import app.aaps.shared.impl.weardata.JsonKeyValues
 import app.aaps.shared.impl.weardata.JsonKeys
 import app.aaps.shared.impl.weardata.ResFileMap
@@ -750,10 +750,9 @@ class CustomWatchface : BaseWatchFace() {
 
         companion object {
 
-            fun init(cwf: CustomWatchface) = entries.forEach {
-                it.cwf = cwf
-                it.arrowCustom = null
-
+            fun init(cwf: CustomWatchface) = entries.forEach { trendArrow ->
+                trendArrow.cwf = cwf
+                trendArrow.arrowCustom = trendArrow.customDrawable?.let { cwf.resDataMap[it.fileName]?.toDrawable(cwf.resources) } ?: ResourcesCompat.getDrawable(cwf.resources, trendArrow.icon, cwf.theme)
             }
 
             fun drawable() = entries.firstOrNull { it.symbol == it.cwf.singleBg[0].slopeArrow }?.arrowCustom ?: NONE.arrowCustom
@@ -766,7 +765,6 @@ class CustomWatchface : BaseWatchFace() {
 
         lateinit var cwf: CustomWatchface
         var arrowCustom: Drawable? = null
-            get() = field ?: customDrawable?.let { cwf.resDataMap[it.fileName]?.toDrawable(cwf.resources)?.also { arrowCustom = it } } ?: ResourcesCompat.getDrawable(cwf.resources, icon, cwf.theme)
     }
 
     private enum class GravityMap(val key: String, val gravity: Int) {
